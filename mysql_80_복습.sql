@@ -49,6 +49,7 @@ SELECT * FROM EMPLOYEE;
 SELECT EMP_NAME, GENDER, HIRE_DATE FROM EMPLOYEE;
 
 -- 사원테이블의 사번, 사원명, 성별, 입사일, 급여를 조회
+desc employee;
 select emp_id, emp_name, gender, hire_date, salary
 from employee;
 
@@ -81,9 +82,8 @@ select curdate() as date from dual;
             WHERE [조건절];		 
 ***************************************/
 -- 정주고 사원의 정보를 조회
-select *
-from employee
-where emp_name = '정주고';
+select * from employee;
+select * from employee where emp_name = '정주고';
 
 -- SYS 부서에 속한 모든 사원을 조회 
 select *
@@ -301,17 +301,27 @@ where emp_name = '일지매' or emp_name = '오삼식' or emp_name ='김삼순';
 -- BETWEEN ~ AND
 -- 특정 기간 : 2015-01-01 ~ 2017-12-31 사이에 입사한 모든 사원 조회
 -- 부서기준으로 오름차순 정렬
-
+select *
+from employee
+where hire_date between '2015-01-01' and '2017-12-31'
+order by dept_id asc;
 
 -- 급여가 6000 이상 8000 이하인 사원들을 모두 조회
-
+select *
+from employee
+where salary between 6000 and 8000;
 
 -- IN
 -- 사원명이 '일지매','오삼식','김삼순' 인 사원들을 조회
-
+select *
+from employee
+where emp_name in('일지매', '오삼식', '김삼순');
 
 -- 부서아이디가 MKT, SYS, STG 에 속한 모든 사원 조회
-
+select *
+from employee
+where dept_id in("mkt", "sys", "stg")
+order by dept_id;
 
 /******************************************************
 	특정 문자열 검색 : 와일드 문자(%, _) + LIKE 연산자
@@ -320,12 +330,21 @@ where emp_name = '일지매' or emp_name = '오삼식' or emp_name ='김삼순';
             WHERE [컬럼명] LIKE '와일드 문자 포함 검색어';		 
 ******************************************************/
 -- '한'씨 성을 가진 모든 사원을 조회
-
+select *
+from employee
+where emp_name like '한%';
 
 -- 영어이름이 'f'로 시작하는 모든 사원을 조회
-
+select *
+from employee
+where eng_name like 'f%';
 
 -- 이메일 이름 중 두번째 자리에 'a'가 들어가는 모든 사원을 조회
-
+select *
+from employee
+where email like '_a%';
 
 -- 이메일 아이디가 4자인 모든 사원을 조회
+select *
+from employee
+where email like '____@%';
