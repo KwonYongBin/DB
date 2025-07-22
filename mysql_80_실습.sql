@@ -89,6 +89,78 @@ where emp_name = "정주고"; -- 문자열은 항상 더블쿼테이션을 감�
 -- sys 부서에 속한 모든 사원을 조회alter
 select * from employee where dept_id = "sys";
 
+-- 사번이 s0005인 사원의 사원명, 성별, 입사일, 부서아이디, 이메일, 급여를 조회
+select emp_name, gender, hire_date, dept_id, email, salary
+from employee
+where emp_id="s0005";
+
+-- sys 부서에 속한 모든 사원들을 조회, 단 출력되는 emp_id 컬럼은 '사원번호' 별칭으로 조회
+desc employee;
+select emp_id as'사원번호', emp_name, eng_name, gender, hire_date, salary
+from employee
+where dept_id = 'sys';
+
+-- emp_name '사원명' 별칭 수정
+desc employee;
+select emp_id as'사원번호', emp_name as '사원명', eng_name, gender, hire_date, salary
+from employee
+where dept_id = 'sys';
+
+-- !! where 조건절 컬럼으로 별칭을 사용할 수 있을까
+-- 사원명이 홍길동인 사원을 별칭으로 조회 가능할까 :: where 조건절에서 별칭을 컬럼명으로 사용할 수 없다.
+desc employee;
+select emp_id as'사원번호', emp_name as '사원명', eng_name, gender, hire_date, salary
+from employee
+where dept_id = '홍길동';
+
+-- 전략기획(stg) 부서의 모든 사원들의 사번, 사원명, 입사일, 급여를 조회
+select * from department;
+select emp_id, emp_name, hire_date, salary, dept_id
+from employee
+where dept_id = 'stg';
+
+-- 입사일이 2014년 8월 1일인 사원들을 조회
+select * from employee
+where hire_date = '2014-08-01'; -- eate(날짜) 타입은 표현은 문자열처럼, 처리는 숫자처럼
+
+-- 급여가 5000인 사원들을 조회
+select * from employee
+where salary = 5000;
+
+-- 성별이 남자인 사원들을 조회
+select * from employee
+where gender = 'm';
+
+-- 성별이 여자인 사원들을 조회
+select * from employee
+where gender = 'f';
+
+-- null :  아직 정의되지 않은 미지수
+-- 숫자에서는 가장 큰수로 인식, 논리적인 의미를 포함하고 있으므로 동호(=)로는 검색 불가, is 키워드와 함께 사용 가능함
+
+-- 급여가 null인 값을 가진 사원들을 조회
+select * from employee
+where salary is null;
+
+-- 영어이름이 정해지지 않은 사원들을 조회
+select * from employee
+where eng_name is null;
+
+-- 퇴사하지 않은 사원들을 조회
+select * from employee
+where retire_date is null;
+
+-- 퇴사하지 않은 사원들의 보너스 컬럼(금여*20)을 추가하여 조회, 컬럼명은  bouns
+select emp_id, emp_name, dept_id, salary, salary*20 as bouns
+from employee
+where retire_date is null;
+
+-- 퇴사한 사원들의 사번, 사원명, 이메일, 폰번호, 급여를 조회
+select emp_id, emp_name, email, phone, salary, retire_date
+from employee
+where retire_date is not null;
+
+
 
 
 
