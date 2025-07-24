@@ -684,10 +684,29 @@ from employee
 where salary is not null
 group by left(hire_date, 4) with rollup;
 
+-- limit 함수 : 출력갯수 제한 함수
+select * from employee
+limit 3;
+
+-- 최대급여를 수급하는 사원 순서대로 5명 조회
+select *
+from employee
+order by salary desc
+limit 5;
 
 
-
-
-
-
+ /******************************************************************
+	Join : 두 개이상의 테이블을 연동해서 sql실행
+    ERD -(Entity Relationship Diagrem) : 데이버베이스 구조도(설계도)
+    - 데이터 모델링 : 정규화 과정
+    
+    ** ANSI SQL : 모든 데이터베이스 시스템들의 표준 SQL
+    Join : 종류
+    (1) 
+    
+********************************************************************/
+use hrdb2019;
+select database();
+select * from employee;
+select * from department;
 
