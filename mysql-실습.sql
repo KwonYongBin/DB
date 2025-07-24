@@ -125,7 +125,6 @@ where retire_date;
 -- Q29) 2019-01-01 ~ 2019-01-07 기간 주문의 주문번호, 고객아이디, 사원번호, 주문일시, 소계, 배송비, 전체금액을 조회하세요.
 --      단, 전체금액을 기준으로 내림차순 정렬해서 조회하세요.
 
-
 -- Q30) 2019-01-01 ~ 2019-01-07 기간 주문의 주문번호, 고객아이디, 사원번호, 주문일시, 소계, 배송비, 전체금액을 조회하세요.
 --      단, 사원번호를 기준으로 오름차순, 같은 사원번호는 주문일시를 기준으로 내림차순 정렬해서 조회하세요.
 
@@ -244,9 +243,15 @@ where order_date  between '2019-01-01' and '2019-01-31'
 GROUP BY order_date, customer_id;
 
 -- Q17) 주문연도별 전체금액 합계를 조회하세요.
+select year(order_date) as 연도, sum(total_due) as 합계
+from order_header
+group by year(order_date);
 
 -- Q18) 2019.01 ~ 2019.06 기간 주문에 대하여 주문연도별, 주문월별 전체금액 합을 조회하세요.
-
+select year(order_date), sum(total_due) as 합계
+from order_header
+where year(order_date) between '2019-01' and '2019-06'
+group by year(order_date);
 -- Q19) 2019.01 ~ 2019.06 기간 주문에 대하여 주문연도별, 주문월별 전체금액 합과 평균을 조회하세요.
 
 -- Q20) 주문연도별, 주문월별 전체금액 합과 평균을 조회하고, rollup 함수를 이용하여 소계와 총계를 출력해주세요.
