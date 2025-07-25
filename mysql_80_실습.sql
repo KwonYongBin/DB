@@ -879,4 +879,32 @@ select emp_id, emp_name
 from employee
 where emp_id = (select emp_id from employee where emp_name = '홍길동');
 
--- git 수정 테스트
+ /******************************************************************
+	서브쿼리(SubQuery) : 메인 쿼리에 다른 쿼리를 추가하여 실행하는 방식
+    형식 : select [컬럼리스트 : (스칼라서브쿼리)]
+		  from [테이블명]
+          where [조건절]
+********************************************************************/
+-- 정보시스템 부서의 사원들을 모두 조회
+-- 사번, 사원명, 부서아이디, 폰번호, 급여
+select emp_id, emp_name, dept_id, phone, salary
+from employee
+where dept_id = (select dept_id from department where dept_name = '정보시스템');
+select dept_id from department where dept_name = '정보시스템';
+
+-- [스칼라 서브쿼리]
+-- '정보시스템' 부섬ㅇ의 사원들을 모두 조회
+-- 사번, 사원명, 부서아이디, 부서명(부서테이블), 폰번호, 급여
+select 
+		emp_id,
+        emp_name,
+        dept_id, 
+        (select dept_name  from department where dept_name = '정보시스템') as dept_name,
+        phone, salary
+from employee
+where dept_id = (select dept_id from department where dept_name = '정보시스템');
+
+select dept_name  from department where dept_name = '정보시스템';
+
+
+
