@@ -893,7 +893,7 @@ where dept_id = (select dept_id from department where dept_name = '정보시스�
 select dept_id from department where dept_name = '정보시스템';
 
 -- [스칼라 서브쿼리]
--- '정보시스템' 부섬ㅇ의 사원들을 모두 조회
+-- '정보시스템' 부서명의 사원들을 모두 조회
 -- 사번, 사원명, 부서아이디, 부서명(부서테이블), 폰번호, 급여
 select 
 		emp_id,
@@ -902,9 +902,14 @@ select
         (select dept_name  from department where dept_name = '정보시스템') as dept_name,
         phone, salary
 from employee
-where dept_id = (select dept_id from department where dept_name = '정보시스템');
+where dept_id = (select dept_id from department where dept_name = '정보시스템'); -- 권장하지 않는 방법 (사용은 된다)
 
 select dept_name  from department where dept_name = '정보시스템';
 
+-- 홍길동 사원이 속한 부서명을 조회
+-- '='로 조건절 비교하는 경우 :: 단일행 서브쿼리
+select dept_name
+from department
+where dept_id = (select dept_id from employee where emp_name = '홍길동');
 
-
+-- 홍길동 사원의 휴가사용 내역을 조회
