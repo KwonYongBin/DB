@@ -49,9 +49,12 @@ SELECT * FROM EMPLOYEE;
 SELECT EMP_NAME, GENDER, HIRE_DATE FROM EMPLOYEE;
 
 -- 사원테이블의 사번, 사원명, 성별, 입사일, 급여를 조회
+select emp_id, emp_name, gender, hire_date, salary
+from employee;
 
 
 -- 부서테이블의 모든 정보 조회
+select * from employee;
 
 -- AS  : 컬럼명 별칭 부여 
 -- 형식> SELECT [컬럼명 as 별칭, ...] FROM [테이블명];
@@ -60,6 +63,8 @@ SELECT EMP_ID AS 사번, EMP_NAME AS "사 원 명", GENDER AS 성별, HIRE_DATE 
 FROM EMPLOYEE;
 
 -- 사원테이블의 ID, NAME, GENDER, HDATE, SALARY 컬럼명으로 조회
+select emp_id as id, emp_name as name, gender as 성별, hire_date as hdate, salary as 급여
+from employee; 
 
 -- 사원테이블의 사번, 사원명, 부서명, 폰번호, 이메일, 급여, 보너스(급여*10%)를 조회
 -- 기존의 컬럼에 연산을 수행하여 새로운 컬럼을 생성할 수 있다!!
@@ -77,14 +82,25 @@ SELECT CURDATE() AS DATE FROM DUAL;
             WHERE [조건절];		 
 ***************************************/
 -- 정주고 사원의 정보를 조회
+select * from employee where emp_name = '정주고';
 
--- SYS 부서에 속한 모든 사원을 조회 
+-- SYS 부서에 속한 모든 사원을 조회
+select * from employee where dept_id = 'sys';
 
 -- 사번이 S0005인 사원의 사원명, 성별, 입사일, 부서아이디, 이메일, 급여를 조회
+select emp_name, gender, hire_date, dept_id, email, salary
+from employee
+where emp_id = 's0005';
 
 -- SYS 부서에 속한 모든 사원들을 조회, 단 출력되는 EMP_ID 컬럼은 '사원번호' 별칭으로 조회
+select emp_id as 사원번호, emp_name, eng_name, gender, hire_date, retire_date, dept_id, phone, email, salary
+from employee
+where dept_id = 'sys';
 
 -- EMP_NAME '사원명' 별칭 수정
+select emp_id, emp_name as 사원명, eng_name, gender, hire_date, retire_date, dept_id, phone, email, salary
+from employee
+where dept_id = 'sys';
 
 -- !! WHERE 조건절 컬럼으로 별칭을 사용할 수 있을까요???
 -- 사원명이 홍길동인 사원을 별칭으로 조회??? ::: WHERE 조건절에서 별칭을 컬럼명으로 사용X 
@@ -93,39 +109,60 @@ FROM EMPLOYEE
 WHERE  사원명 = '홍길동';
 
 -- 전략기획(STG) 부서의 모든 사원들의 사번, 사원명, 입사일, 급여를 조회
+select emp_id, emp_name, hire_date, salary
+from employee
+where dept_id = 'stg';
 
 -- 입사일이 2014년 8월 1일인 사원들을 조회
+select * from employee where hire_date = '2014-08-01';
 
 -- 급여가 5000인 사원들을 조회
+select * from employee where salary = 5000;
 
 -- 성별이 남자인 사원들을 조회
+select * from employee where gender = 'm';
 
 -- 성별이 여자인 사원들을 조회
+select * from employee where gender = 'f';
 
 -- NULL : 아직 정의되지 않은 미지수
 -- 숫자에서는 가장 큰수로 인식, 논리적인 의미를 포함하고 있으므로 등호(=)로는 검색 X, IS 키워드와 함께 사용 O
 
 -- 급여가 NULL인 값을 가진 사원들을 조회
+select * from employee where salary is null;
 
 -- 영어이름이 정해지지 않은 사원들을 조회
+select * from employee where eng_name is null;
 
 -- 퇴사하지 않은 사원들을 조회
+select * from employee where retire_date is null;
 
 -- 퇴사하지 않은 사원들의 보너스 컬럼(급여*20%)을 추가하여 조회, 컬럼명은 BONUS
+select emp_id, emp_name, eng_name, gender, hire_date, retire_date, dept_id, phone, email, salary, salary*0.2 as bonus
+from employee
+where retire_date is null;
 
--- 퇴사한 사원들의 사번, 사원명, 이메일, 폰번호, 급여를 조회
+-- 퇴사한 사원들의 사번, 사원명, 이메일, 폰번호, 급여를 조회\
+select emp_id, emp_name, retire_date, email, phone, salary
+from employee
+where retire_date is not null;
 
 -- IFNULL 함수 : NULL 값을 다른 값은 대체하는 방법
 -- 형식> IFNULL(NULL포함컬럼명, 대체값)
 
 -- STG 부서에 속한 사원들의 정보 조회, 단, 급여가 NULL인 사원은 0으로 치환
-SELECT EMP_ID, EMP_NAME, EMAIL, PHONE, IFNULL(SALARY, 0) AS SALARY
-FROM EMPLOYEE
-WHERE DEPT_ID = 'STG';
+select emp_id, emp_name, dept_id, hire_date, phone, email, ifnull(salary, 0) as salary
+from employee
+where dept_id = 'stg';
 
 -- 사원 전체 테이블의 내용을 조회, 단 영어이름이 정해지지 않은 사원들은 'SMITH' 이름으로 치환
+select emp_id, emp_name, ifnull(eng_name, 'smith'), gender, hire_date, retire_date, dept_id, phone, email, salary
+from employee;
 
 -- MKT 부서의 사원들을 조회, 재직중인 사원들의 RETIRE_DATE 컬럼은 현재 날짜로 치환
+select emp_id, emp_name, eng_name, gender, hire_date, ifnull(retire_date, curdate()) as retire_date, dept_id, phone, email, salary
+from employee
+where dept_id = 'mkt';
 
 /**************************************
 	DISTINCT  : 중복된 데이터를 배제하고 조회
