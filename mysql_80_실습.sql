@@ -1485,21 +1485,65 @@ select * from emp;
 		SID(과목아이디),
 		PDATE(등록일자) 년월일 시분초
 */
+-- 과목 테이블 생성
+create table subject(
+	sid 	int 	primary key		auto_increment,
+    sname 	varchar(20)		not null,
+    sdate	datetime
+);
+show tables;
+desc subject;
+
+-- 학생테이블
+create table student(
+	stid 	int 	 		primary key		auto_increment,
+    sname 	varchar(10) 	not null,
+    gender 	char(1) 		not null,
+    sid		int,
+    stdate	datetime,
+    constraint fk_sid_student 	foreign key(sid)
+								references subject(sid)
+);
+show tables;
+desc student;
+
+-- 교수 테이블
+create table professor(
+	pid 	int 	 		primary key		auto_increment,
+    name 	varchar(10) 	not null,
+    sid		int,
+    pdate	datetime,
+    constraint fk_sid_professor		foreign key(sid)
+									references subject(sid)
+);
+show tables;
+desc professor;
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+select * from information_schema.table_constraints
+	where table_name in('subject', 'student', 'professor');
+
+-- 과목 데이터 추가
+insert into subject(sname, sdate) values('java', now());
+insert into subject(sname, sdate) values('mysql', now());
+insert into subject(sname, sdate) values('html', now());
+insert into subject(sname, sdate) values('react', now());
+insert into subject(sname, sdate) values('node', now());
+select * from subject;
+
+-- 학생 데이터 추가
+insert into student(sname, gender, sid, stdate)
+	values('홍길동', 'm', 1, now());
+insert into student(sname, gender, sid, stdate)
+	values('이순신', 'm', 3, now());
+insert into student(sname, gender, sid, stdate)
+	values('김유신', 'm', 3, now());
+insert into student(sname, gender, sid, stdate)
+	values('박보검', 'm', 4, now());
+insert into student(sname, gender, sid, stdate)
+	values('아이유', 'f', 4, now());
+select * from student;
+
+
+
+
+
