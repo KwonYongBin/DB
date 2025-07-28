@@ -209,26 +209,54 @@ ORDER BY 급여 DESC;
 		 ORDER BY [컬럼명, ...] ASC/DESC
 ***************************************/
 -- 급여가 5000 이상인 사원들을 조회, 급여를 오름차순 정렬
+select *
+from employee
+where salary >= 5000
+order by salary asc;
 
 -- 2017-01-01 이후 입사한 사원들을 조회
+select *
+from employee
+where hire_date >= '2017-01-01';
 
 -- 입사일이 2015-01-01 이후이거나, 급여가 6000인 이상인 사원들을 조회  
 -- ~이거나, ~또는 : OR - 두 개의 조건중 하나만 만족해도 조회가능
+select *
+from employee
+where hire_date >= '2017-01-01' or salary >= 6000;
 
 -- 입사일이 2015-01-01 이후이고, 급여가 6000인 이상인 사원들을 조회  
 -- ~이고 : AND - 두 개의 조건이 모두 만족해야만 조회 가능
+select *
+from employee
+where hire_date >= '2015-01-01' and salary >= 6000;
 
 -- 특정 기간 : 2015-01-01 ~ 2017-12-31 사이에 입사한 모든 사원 조회
 -- 부서기준으로 오름차순 정렬
+select *
+from employee
+where hire_date >= '2015-01-01' and hire_date <= '2017-12-31'
+order by salary asc;
 
 -- 급여가 6000 이상 8000 이하인 사원들을 모두 조회
+select *
+from employee
+where salary >= 6000 and salary <= 8000;
 
 -- MKT 부서의 사원들의 사번, 사원명, 입사일, 이메일, 급여, 보너스(급여의 20%) 조회
 -- 급여가 NULL인 사원의 보너스는 기본 50
 -- 보너스가 1000 이상인 사원 조회
 -- 보너스가 높은 사원 기준으로 정렬
 
+select emp_id, emp_name, hire_date, email, salary, ifnull(salary*0.2, 50) as bonus
+from employee
+where salary*0.2 >= 1000
+order by bonus desc;
+
 -- 사원명이 '일지매','오삼식','김삼순' 인 사원들을 조회
+select *
+from employee
+where emp_name = '일지매' or emp_name =  '오삼식' or emp_name = '김삼순';
 
 /******************************************************
 	논리곱(AND) : BETWEEN ~ AND 
