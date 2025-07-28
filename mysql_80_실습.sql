@@ -1736,19 +1736,17 @@ group by p.name;
 
 -- 회워이 주문한 내역과 제품명 조회
 -- 회원명, 가입날짜, 주문날짜, 주문수량, 제품명, 가격
-select m.name, m.created_at, o.order_date, oi.quantity, p.name, p.price
-from member m, `order` o, orderitem oi, product p
-where m.member_id = o.member_id
-and o.order_id = oi.order_id
-and oi.product_id = p.product_id;
+-- 주문되지 않은 모든 제품 출력
+select t1.name, t1.created_at, t1.order_date, t1.quantity, p.name, p.price
+from (select distinct m.name, m.created_at, o.order_date, oi.quantity, oi.product_id
+		from member m, `order` o, orderitem oi
+        where m.member_id = o.member_id
+		and o.order_id = oi.order_id) t1 right outer join product p
+										on t1.product_id = p.product_id;
 
-update orderitem set order_id = 2 where order_item_id =2;
-update orderitem set order_id = 3 where order_item_id =3;
-update orderitem set order_id = 4 where order_item_id =4;
-
-
-
-
+/*******************************************************************
+	행번호,
+********************************************************************/
 
 
 
