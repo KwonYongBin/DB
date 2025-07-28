@@ -1543,6 +1543,214 @@ insert into student(sname, gender, sid, stdate)
 	values('아이유', 'f', 4, now());
 select * from student;
 
+-- 교수 데이터 추가
+insert into professor(name, sid, pdate) values('스미스', 1, now());
+insert into professor(name, sid, pdate) values('홍홍', 3, now());
+insert into professor(name, sid, pdate) values('김철수', 4, now());
+select * from professor;
+
+-- 홍길동 학생이 수강하는 과목명을 조회
+select st.sname
+from subject su, student st
+where su.sid = st.sid
+	and st.sname = '홍길동';
+
+select su.sname
+from subject su inner join student st
+				 on su.sid = st.sid
+where st.sname = '홍길동';
+
+select sname from subject
+where sid  = (select sid from student where sname = '홍길동');
+
+-- 홍길동 학생이 수강하는 과목명과 학생명을 조회
+select su.sname as 과목명, st.sname as 학생명
+from subject su, student st
+where su.sid = st.sid
+and st.sname = '홍길동';
+
+-- 스미스 교수가 강의하는 과목을 조회
+select s.sname
+from subject s inner join professor p
+on s.sid = p.sid
+where p.name = '스미스';
+
+select su.sname
+from subject su, professor pr
+where su.sid = pr.sid
+ and pr.name = '스미스';
+
+-- java, 안중근 교수 추가
+insert into professor(name, sid, pdate) values('안중근', 1, now());
+select * from professor;
+
+-- java 수업을 강의하는 모든 교수 조회
+ select p.name
+ from professor p, subject su
+ where p.sid = su.sid 
+	and su.sname = 'java';
+
+select p.name
+from professor p inner join subject su
+				on p.sid = su.sid
+where su.sname = 'java';
+
+select name from professor
+where sid = (select sid from subject where sname = 'java');
+
+-- java 수업을 강의하는 교수와 수강신청한 학생들을 조회
+-- 과목아이디, 과목명, 교수명, 학생명
+select su.sid, su.sname, p.name, st.sname
+from subject su, professor p, student st
+where su.sid = p.pid
+and su.sid = st.sid
+and su.sname = 'java';
+
+select su.sid, su.sname, p.name, st.sname
+from subject su inner join professor p on su.sid = p.sid
+				inner join student st  on su.sid = st.sid
+where su.sname = 'java';
+
+-- 김철수 교수가 강의하는 과목을 수강하는 학생 조회
+-- 학생명 출력, 서브쿼리
+select sname from student
+where sid = (select sid from subject
+			 where sid = (select sid from professor where name = '김철수'));
+             
+desc student;
+select * from student;
+-- kor, eng, math 과목 컬럼 추가, decimal(10,2)
+alter table student
+add column kor decimal(7,2) null;
+
+alter table student
+add column eng decimal(7,2) null;
+
+alter table student
+add column math decimal(7,2) null;
+
+desc student;
+select * from student;
+
+update student -- 과목에 기본 점수 업데이트
+set kor = 0.0, eng = 0.0, math = 0.0
+where kor is null
+	and eng is null
+	and math is null;
+
+select * from student;
+
+/*******************************************************************
+	회원, 상품, 주문, 주문상세 테이블 생성 및 실습
+********************************************************************/
+show tables;
+select * from member;
+insert into member(name, email) values('홍길동', 'hong@naver.com');
+
+create table member(
+	member_id 	int		primary key		auto_increment,
+    name		varchar(50)		not null,
+    email		varchar(100)	unique		not null,
+	created_at		datetime	default		current_timestamp
+);
+
+create table product(
+	product_id		int		primary key		auto_increment,
+    name			varchar(100)		not null,
+    price		decimal(10, 2)			not null,
+	stock		int		default 		0
+);
+
+create table `order`(
+	order_id	int		primary key		auto_increment,
+    member_id 	int		not null,
+    order_date 	datetime	default current_timestamp,
+    status		varchar(20)		default '주문완료',
+    constraint	fk_member_id_member foreign key(member_id) references member(member_id)
+);
+
+create table orderitem(
+	order_item 		int		primary key		auto_increment,
+    order_id		int		not null,
+    product_id		int 	not null,
+    quantity		int						not null,
+    unit_price 		decimal(10, 2) 			not null,
+    constraint		fk_order_id_order foreign key(order_id) references `order`(order_id),
+    constraint		fk_product_id_product		foreign key(product_id)		references product(product_id)
+);
+
+desc product;
+insert into product(name, price)
+values('모니터', 3000),
+	  ('키보드', 2000),
+      ('마우스', 1500);
+select * from product;
+
+desc `order`;
+insert into `order`(member_id, order_date)
+	values(1, '2024-06-25');
+insert into `order`(member_id, order_date)
+	values(2, '2025-01-25');
+    
+select * from `order`;
+
+desc orderitem;
+insert into orderitem(order_id, product_id, quantity, unit_price)
+	values(1, 2, 1, 2000);
+    
+insert into orderitem(order_id, product_id, quantity, unit_price)
+	values(2, 3, 2, 2500);
+select * from orderitem;
+
+-- 홍길동 고객의 고객명, 이메일, 가입날짜, 주문날짜를 조회
+-- 주문 날짜는 년, 월, 일로만 출력
+select m.name, m.email, m.created_at, left(o.order_date, 10) as order_date
+from member m inner join `order` o on m.member_id = o.member_id
+where m.name ='홍길동';
+
+-- 상품별 주문 건수
+-- 상품명, 주문건수
+select p.name, count(*) as count
+from product p, orderitem oi
+where p.product_id = oi.product_id
+group by p.name
+order by count;
+
+select p.name, count(*) as count
+from product p inner join orderitem oi
+on p.product_id = oi.product_id
+group by p.name
+order by count;
+
+insert into product(name, price)
+values('리모컨', 3000),
+	  ('USB', 2000);
+select * from product;
+
+-- 상품별 주문 건수, 모든 상품 조회
+select p.name, count(quantity) as count
+from product p left outer join orderitem oi
+			   on p.product_id = oi.product_id
+group by p.name;
+
+
+-- 회워이 주문한 내역과 제품명 조회
+-- 회원명, 가입날짜, 주문날짜, 주문수량, 제품명, 가격
+select m.name, m.created_at, o.order_date, oi.quantity, p.name, p.price
+from member m, `order` o, orderitem oi, product p
+where m.member_id = o.member_id
+and o.order_id = oi.order_id
+and oi.product_id = p.product_id;
+
+update orderitem set order_id = 2 where order_item_id =2;
+update orderitem set order_id = 3 where order_item_id =3;
+update orderitem set order_id = 4 where order_item_id =4;
+
+
+
+
+
+
 
 
 
