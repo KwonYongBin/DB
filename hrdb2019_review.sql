@@ -269,13 +269,26 @@ where emp_name = '일지매' or emp_name =  '오삼식' or emp_name = '김삼순
 -- BETWEEN ~ AND
 -- 특정 기간 : 2015-01-01 ~ 2017-12-31 사이에 입사한 모든 사원 조회
 -- 부서기준으로 오름차순 정렬
+select *
+from employee
+where hire_date between '2015-01-01' and '2017-12-31'
+order by dept_id asc;
 
 -- 급여가 6000 이상 8000 이하인 사원들을 모두 조회
+select * 
+from employee
+where salary >= 6000 and salary <= 8000;
 
 -- IN
 -- 사원명이 '일지매','오삼식','김삼순' 인 사원들을 조회
+select *
+from employee
+where emp_name in ('일지매', '오삼식', '김삼순');
 
 -- 부서아이디가 MKT, SYS, STG 에 속한 모든 사원 조회
+select *
+from employee
+where dept_id in ('mkt', 'sys', 'stg');
 
 /******************************************************
 	특정 문자열 검색 : 와일드 문자(%, _) + LIKE 연산자
@@ -284,12 +297,24 @@ where emp_name = '일지매' or emp_name =  '오삼식' or emp_name = '김삼순
             WHERE [컬럼명] LIKE '와일드 문자 포함 검색어';		 
 ******************************************************/
 -- '한'씨 성을 가진 모든 사원을 조회
+select *
+from employee
+where emp_name like '한%';
 
 -- 영어이름이 'f'로 시작하는 모든 사원을 조회
+select *
+from employee
+where eng_name like 'f%';
 
 -- 이메일 이름 중 두번째 자리에 'a'가 들어가는 모든 사원을 조회
+select *
+from employee
+where email like '_a%';
 
 -- 이메일 아이디가 4자인 모든 사원을 조회
+select *
+from employee
+where email like '____@%';
 
 /******************************************************
 		내장함수 : 숫자함수, 문자함수, 날짜함수 
@@ -330,35 +355,64 @@ select concat('안녕하세요~', " 홍길동", ' 입니다.') as str from dual;
 
 -- 사번, 사원명, 사원명2 컬럼을 생성하여 조회
 -- 사원명2 컬럼의 데이터 형식은 S0001(홍길동) 출력
+select emp_id, emp_name, concat(emp_id, '(', emp_name,')') as emp_name2
+from employee;
 
 -- 사번, 사원명, 영어이름, 입사일, 폰번호, 급여를 조회
 -- 영어이름의 출력형식을 '홍길동/hong' 타입으로 출력
 -- 영어이름이 null인 경우에는 'smith'를 기본으로 조회
+select emp_id, emp_name, concat(emp_name, '/', ifnull(eng_name, 'smith')) as eng_name, hire_date, phone, salary
+from employee;
 
 -- (2) substring(문자열, 위치, 갯수) : 문자열 추출, 공백도 한문자 처리
+select substring("대한민국 홍길동", 1, 4), 
+		substring("대한민국 홍길동", 6, 3) 
+from dual;
 
 -- 사원테이블의 사번, 사원명, 입사년도, 입사월, 입사일, 급여를 조회
+select 
+		emp_id, emp_name, 
+		substring(hire_date, 1, 4) as 년도,
+        substring(hire_date, 6, 2) as 달,
+        substring(hire_date, 9, 2) as 일,
+        salary
+from employee; 
 
 -- 2015년도에 입사한 모든 사원 조회
+select *
+from employee
+where substring(hire_date, 1, 4) = '2015';
 
 -- 2018년도에 입사한 정보시스템(sys) 부서 사원 조회
-     
+select *
+from employee
+where substring(hire_date, 1, 4) = '2018' and dept_id = 'sys';
 
 -- (3) left(문자열, 갯수), right(문자열, 갯수) : 왼쪽, 오른쪽 기준으로 문자열 추출	
 select left(curdate(), 4) as year, right('010-1234-4567', 4) as phone from dual;
 
 -- 2018년도에 입사한 모든 사원 조회
+select *
+from employee
+where left(hire_date, 4) = '2018';
 
 -- 2015년부터 2017년 사이에 입사한 모든 사원 조회
+select *
+from employee
+where left(hire_date, 4) between '2015' and '2017';
 
 -- 사원번호, 사원명, 입사일, 폰번호, 급여를 조회
 -- 폰번호는 마지막 4자리만 출력
+select emp_id, emp_name, hire_date, right(phone, 4) as phone, salary
+from employee;
 
 -- (4) upper(문자열), lower(문자열) : 대문자, 소문자로 치환
 select upper('welcomeToMysql!!'), lower('welcomeToMysql!!') from dual;
 
 -- 사번, 사원명, 영어이름, 부서아이디, 이메일, 급여를 조회
 -- 영어이름은 대문자, 부서아이디는 소문자, 이메일은 대문자
+select emp_id, emp_name, upper(eng_name), lower(dept_id), upper(email), salary
+from employee;
 
 -- (5) trim() : 공백 제거
 select 	trim('     대한민국') as t1,
@@ -376,6 +430,10 @@ select format('123456', 0) as format from dual;
 -- 급여가 null인 경우에는 기본값 0 
 -- 2016년부터 2017년 사이에 입사한 사원
 -- 사번 기준으로  내림차순 정렬
+select emp_id, emp_name, hire_date, phone, format(ifnull(salary, 0), 0) as 급여 , format(salary*0.2, 0) as 보너스
+from employee
+where left(hire_date, 4) between '2016' and '2017'
+order by emp_id desc;
 
 -- [날짜함수]
 -- curdate() : 현재 날짜(년, 월, 일)
