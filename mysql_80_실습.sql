@@ -479,7 +479,7 @@ select  emp_id,
         format(ifnull(salary,0), 0) as salary,
         format(ifnull(salary,0) * 0.2, 0) as bonus
 from employee
-where left(hire_date, 4) between '2016' and '2017'
+where left(hire_date, 4) between '2015' and '2017'
 order by emp_id desc;
 
 -- [날짜함수]
@@ -642,7 +642,7 @@ select  dept_id,
 from employee
 where salary is not null
 group by dept_id
-having sum(salary) >= 30000;   
+having sum(salary) >= 30000;        
 	
 -- 연도별, 사원수, 총급여, 평균급여, 최대급여, 최소급여 조회
 -- 소수점 X, 3자리 구분
@@ -666,7 +666,7 @@ select  dept_id,
 		sum(ifnull(salary,0)) sum,
         avg(ifnull(salary,0)) avg
 from employee
-group by dept_id with rollup;
+group by dept_id with rollup;      
 
 -- rollup한 결과의 부서아이디를 추가
 select  if(grouping(dept_id), '총합계', ifnull(dept_id, '-')) as dept_id,
@@ -812,7 +812,7 @@ where e.dept_id = d.dept_id
 	and d.unit_id = u.unit_id
     and left(hire_date,4) between '2014' and '2016'
     and e.retire_date is null
-order by u.unit_id asc;   
+order by u.unit_id asc;    
 
 -- 부서별 총급여, 평균급여, 총휴가사용일수를 조회
 -- 부서명, 부서아이디, 총급여, 평균급여, 휴가사용일수 
@@ -1487,50 +1487,52 @@ select * from emp;
 */
 -- 과목 테이블 생성
 create table subject(
-	sid 	int 	primary key		auto_increment,
-    sname 	varchar(20)		not null,
+	sid		int 			primary key 	auto_increment,
+    sname	varchar(20)		not null,
     sdate	datetime
 );
 show tables;
-desc subject;
+desc subject;  
 
--- 학생테이블
+-- 학생 테이블 생성
 create table student(
-	stid 	int 	 		primary key		auto_increment,
-    sname 	varchar(10) 	not null,
-    gender 	char(1) 		not null,
-    sid		int,
-    stdate	datetime,
-    constraint fk_sid_student 	foreign key(sid)
+	stid		int				auto_increment 		primary key,
+    sname		varchar(10)		not null,
+    gender		char(1)			not null,
+    sid			int,
+    stdate		datetime,
+    constraint fk_sid_student	foreign key(sid)
 								references subject(sid)
-);
+);  
 show tables;
 desc student;
 
--- 교수 테이블
+-- 교수 테이블 생성
 create table professor(
-	pid 	int 	 		primary key		auto_increment,
-    name 	varchar(10) 	not null,
-    sid		int,
-    pdate	datetime,
-    constraint fk_sid_professor		foreign key(sid)
-									references subject(sid)
+	pid			int				primary key			auto_increment,
+    name		varchar(10)		not null,
+    sid			int,
+    pdate		datetime,
+    constraint 	fk_sid_professor foreign key(sid)
+								references subject(sid)    
 );
 show tables;
 desc professor;
-    
+
 select * from information_schema.table_constraints
-	where table_name in('subject', 'student', 'professor');
+	where table_name in ('subject', 'student', 'professor ');
+
 
 -- 과목 데이터 추가
-insert into subject(sname, sdate) values('java', now());
-insert into subject(sname, sdate) values('mysql', now());
-insert into subject(sname, sdate) values('html', now());
-insert into subject(sname, sdate) values('react', now());
-insert into subject(sname, sdate) values('node', now());
+insert into subject(sname, sdate) values('java', now());    
+insert into subject(sname, sdate) values('mysql', now());  
+insert into subject(sname, sdate) values('html', now());  
+insert into subject(sname, sdate) values('react', now());  
+insert into subject(sname, sdate) values('node', now());  
+
 select * from subject;
 
--- 학생 데이터 추가
+-- 학생 데이터 입력
 insert into student(sname, gender, sid, stdate)
 	values('홍길동', 'm', 1, now());
 insert into student(sname, gender, sid, stdate)
@@ -1540,59 +1542,71 @@ insert into student(sname, gender, sid, stdate)
 insert into student(sname, gender, sid, stdate)
 	values('박보검', 'm', 4, now());
 insert into student(sname, gender, sid, stdate)
-	values('아이유', 'f', 4, now());
+	values('아이유', 'f', 4, now());    
 select * from student;
 
 -- 교수 데이터 추가
 insert into professor(name, sid, pdate) values('스미스', 1, now());
 insert into professor(name, sid, pdate) values('홍홍', 3, now());
 insert into professor(name, sid, pdate) values('김철수', 4, now());
+
 select * from professor;
 
+desc student;
+desc subject;
+
 -- 홍길동 학생이 수강하는 과목명을 조회
-select st.sname
+select su.sname 
 from subject su, student st
 where su.sid = st.sid
 	and st.sname = '홍길동';
 
 select su.sname
 from subject su inner join student st
-				 on su.sid = st.sid
+				on su.sid = st.sid
 where st.sname = '홍길동';
 
+
 select sname from subject
-where sid  = (select sid from student where sname = '홍길동');
+where sid = (select sid from student where sname = '홍길동');
 
 -- 홍길동 학생이 수강하는 과목명과 학생명을 조회
 select su.sname as 과목명, st.sname as 학생명
 from subject su, student st
 where su.sid = st.sid
-and st.sname = '홍길동';
+	and st.sname = '홍길동';
+
+select su.sname as 과목명, st.sname as 학생명
+from subject su inner join student st
+				on su.sid = st.sid
+where st.sname = '홍길동';
 
 -- 스미스 교수가 강의하는 과목을 조회
-select s.sname
-from subject s inner join professor p
-on s.sid = p.sid
-where p.name = '스미스';
+select su.sname
+from subject su, professor p
+where su.sid = p.sid
+	and name = '스미스';
 
 select su.sname
-from subject su, professor pr
-where su.sid = pr.sid
- and pr.name = '스미스';
+from subject su	inner join professor p
+				on su.sid = p.sid
+where name = '스미스';
+
+select sname from subject
+where sid = (select sid from professor where name = '스미스');            
 
 -- java, 안중근 교수 추가
-insert into professor(name, sid, pdate) values('안중근', 1, now());
+insert into professor(name, sid, pdate) values('안중근', 1, now());    
 select * from professor;
 
 -- java 수업을 강의하는 모든 교수 조회
- select p.name
- from professor p, subject su
- where p.sid = su.sid 
-	and su.sname = 'java';
+select p.name
+from professor p, subject su
+where p.sid = su.sid and su.sname = 'java';
 
 select p.name
-from professor p inner join subject su
-				on p.sid = su.sid
+from professor p  inner join subject su
+				  on p.sid = su.sid
 where su.sname = 'java';
 
 select name from professor
@@ -1602,22 +1616,23 @@ where sid = (select sid from subject where sname = 'java');
 -- 과목아이디, 과목명, 교수명, 학생명
 select su.sid, su.sname, p.name, st.sname
 from subject su, professor p, student st
-where su.sid = p.pid
-and su.sid = st.sid
-and su.sname = 'java';
+where su.sid = p.sid 
+	and su.sid = st.sid
+	and su.sname = 'java';
 
 select su.sid, su.sname, p.name, st.sname
-from subject su inner join professor p on su.sid = p.sid
+from subject su inner join professor p	on su.sid = p.sid
 				inner join student st  on su.sid = st.sid
-where su.sname = 'java';
+where su.sname = 'java';  
 
 -- 김철수 교수가 강의하는 과목을 수강하는 학생 조회
 -- 학생명 출력, 서브쿼리
 select sname from student
 where sid = (select sid from subject
-			 where sid = (select sid from professor where name = '김철수'));
-             
-desc student;
+				where sid = (select sid from professor where name = '김철수'));
+                
+--
+desc student;  
 select * from student;
 -- kor, eng, math 과목 컬럼 추가, decimal(10,2)
 alter table student
@@ -1632,84 +1647,59 @@ add column math decimal(7,2) null;
 desc student;
 select * from student;
 
-update student -- 과목에 기본 점수 업데이트
+update student
 set kor = 0.0, eng = 0.0, math = 0.0
-where kor is null
+where kor is null 
 	and eng is null
-	and math is null;
+    and math is null;
 
-select * from student;
-
-/*******************************************************************
+select * from student;   
+ 
+/********************************************
 	회원, 상품, 주문, 주문상세 테이블 생성 및 실습
-********************************************************************/
+*********************************************/
 show tables;
 select * from member;
-insert into member(name, email) values('홍길동', 'hong@naver.com');
-
-create table member(
-	member_id 	int		primary key		auto_increment,
-    name		varchar(50)		not null,
-    email		varchar(100)	unique		not null,
-	created_at		datetime	default		current_timestamp
-);
-
-create table product(
-	product_id		int		primary key		auto_increment,
-    name			varchar(100)		not null,
-    price		decimal(10, 2)			not null,
-	stock		int		default 		0
-);
-
-create table `order`(
-	order_id	int		primary key		auto_increment,
-    member_id 	int		not null,
-    order_date 	datetime	default current_timestamp,
-    status		varchar(20)		default '주문완료',
-    constraint	fk_member_id_member foreign key(member_id) references member(member_id)
-);
-
-create table orderitem(
-	order_item 		int		primary key		auto_increment,
-    order_id		int		not null,
-    product_id		int 	not null,
-    quantity		int						not null,
-    unit_price 		decimal(10, 2) 			not null,
-    constraint		fk_order_id_order foreign key(order_id) references `order`(order_id),
-    constraint		fk_product_id_product		foreign key(product_id)		references product(product_id)
-);
+insert into member(name, email) values('이순신','lee@naver.com');
 
 desc product;
-insert into product(name, price)
-values('모니터', 3000),
-	  ('키보드', 2000),
-      ('마우스', 1500);
+insert into product(name, price) 
+values  ('모니터', 1000),
+		('키보드', 2000),
+		('마우스',2500);
 select * from product;
 
+show tables;
 desc `order`;
+select * from `order`;
 insert into `order`(member_id, order_date)
 	values(1, '2024-06-25');
 insert into `order`(member_id, order_date)
-	values(2, '2025-01-25');
-    
-select * from `order`;
+	values(2, '2025-01-25');      
 
-desc orderitem;
+show tables;
+desc orderitem;   
 insert into orderitem(order_id, product_id, quantity, unit_price)
 	values(1, 2, 1, 2000);
-    
+
 insert into orderitem(order_id, product_id, quantity, unit_price)
-	values(2, 3, 2, 2500);
+	values(2, 3, 2, 2500);    
 select * from orderitem;
 
 -- 홍길동 고객의 고객명, 이메일, 가입날짜, 주문날짜를 조회
--- 주문 날짜는 년, 월, 일로만 출력
-select m.name, m.email, m.created_at, left(o.order_date, 10) as order_date
+-- 주문날짜는 년, 월, 일로만 출력
+desc member;
+select m.name, m.email, m.created_at, left(o.order_date, 10) as order_date 
+from member m, `order` o
+where m.member_id = o.member_id
+	and m.name = '홍길동';
+
+select m.name, m.email, m.created_at, left(o.order_date, 10) as order_date 
 from member m inner join `order` o on m.member_id = o.member_id
-where m.name ='홍길동';
+where m.name = '홍길동';    
 
 -- 상품별 주문 건수
--- 상품명, 주문건수
+-- 상품명, 주문건수 출력
 select p.name, count(*) as count
 from product p, orderitem oi
 where p.product_id = oi.product_id
@@ -1717,39 +1707,292 @@ group by p.name
 order by count;
 
 select p.name, count(*) as count
-from product p inner join orderitem oi
-on p.product_id = oi.product_id
+from product p inner join orderitem oi on p.product_id = oi.product_id
 group by p.name
 order by count;
 
-insert into product(name, price)
-values('리모컨', 3000),
-	  ('USB', 2000);
+insert into product(name, price) 
+values  ('리모컨', 3000),
+		('USB', 2000);
 select * from product;
+  
+select * from emp;
+alter table emp
+	rename column emp_name to ename;
+  
+  
 
--- 상품별 주문 건수, 모든 상품 조회
+-- 상품별 주문 건수(수량), 모든 상품 조회
 select p.name, count(quantity) as count
 from product p left outer join orderitem oi
-			   on p.product_id = oi.product_id
-group by p.name;
+				on p.product_id = oi.product_id
+group by p.name;                
 
-
--- 회워이 주문한 내역과 제품명 조회
+-- 회원이 주문한 내역과 제품명 조회
 -- 회원명, 가입날짜, 주문날짜, 주문수량, 제품명, 가격
--- 주문되지 않은 모든 제품 출력
+select m.name, m.created_at, o.order_date, oi.quantity, p.name, p.price
+from member m, `order` o, orderitem oi, product p
+where m.member_id = o.member_id 
+	and o.order_id = oi.order_id
+    and oi.product_id = p.product_id;
+
+-- 회원이 주문한 내역과 제품명 조회
+-- 회원명, 가입날짜, 주문날짜, 주문수량, 제품명, 가격
+-- 주문되지 않은 모든 제품 출력 
 select t1.name, t1.created_at, t1.order_date, t1.quantity, p.name, p.price
 from (select distinct m.name, m.created_at, o.order_date, oi.quantity, oi.product_id
 		from member m, `order` o, orderitem oi
-        where m.member_id = o.member_id
+		where m.member_id = o.member_id 
+		and o.order_id = oi.order_id) t1 right outer join product p
+										on t1.product_id = p.product_id;
+                                        
+/********************************************
+	행번호, 트리거를 이용한 사원번호 생성
+*********************************************/
+use hrdb2019;
+select database();
+
+-- 사원테이블의 사번, 사원명, 입사일, 폰번호, 이메일, 급여 조회
+select emp_id, emp_name, hire_date, phone, email, salary
+from employee;
+
+-- row_number() over(order by 컬럼명 ASC/DESC)
+-- 입사일 : 입사년도, 급여: 3자리 구분
+select 
+	row_number() over(order by emp_id) as rno,
+    emp_id, 
+    emp_name, 
+    concat(left(hire_date, 4), '년') as hire_date,
+    phone, 
+    email, 
+    salary,
+	concat(format(salary, 0), '원') as salary
+from employee;
+
+-- rno 행번호 추가, 주문날짜(년,월,일), 가격(소수점 생략, 3자리 구분)
+select 
+	row_number() over() as rno,
+    t1.name, 
+    t1.created_at, 
+    left(t1.order_date, 10) as order_date, 
+    t1.quantity, 
+    p.name, 
+    format(floor(p.price), 0) as price
+from (select distinct m.name, m.created_at, o.order_date, oi.quantity, oi.product_id
+		from member m, `order` o, orderitem oi
+		where m.member_id = o.member_id 
 		and o.order_id = oi.order_id) t1 right outer join product p
 										on t1.product_id = p.product_id;
 
-/*******************************************************************
-	행번호,
-********************************************************************/
+-- 석차를 구하는 함수
+select 
+	-- row_number() over(order by emp_id desc) as rno, 
+	rank() over(order by salary desc) as r,
+	emp_id, 
+    emp_name,
+    dept_id,
+    salary
+from employee;   
+
+-- 트리거 : 프로시저(함수, 메소드)를 호출하는 시작점
+select *
+from information_schema.triggers;
+
+-- 트리거 실습 테이블
+create table trg_member(
+	mid		char(5),	 -- 'M0001'
+    name	varchar(10),
+    mdate	date
+);
+show tables;
+desc trg_member;
+select * from trg_member;
+
+-- trg_member, mid 컬럼 타입 수정 : varchar(10)
+alter table trg_member
+	modify column mid  varchar(10);
+desc trg_member;    
 
 
+-- trigger 생성 : 여러개의 sql문 포함
+/************************************************/
+delimiter $$
+create trigger trg_member_mid
+before insert on trg_member -- 테이블명
+for each row
+begin
+declare max_code int;  --  'M0001'
+
+-- 현재 저장된 값 중 가장 큰 값을 가져옴
+SELECT IFNULL(MAX(CAST(right(mid, 4) AS UNSIGNED)), 0)
+INTO max_code
+FROM trg_member; 
+
+-- 'M0001' 형식으로 아이디 생성, LPAD(값, 크기, 채워지는 문자형식) : M0001
+-- SET NEW.mid = concat('M', LPAD((max_code+1), 4, '0'));
+SET NEW.mid = concat('M', LPAD((max_code+1), 4, '0'));
+
+end $$
+delimiter ;
+/************************************************/
+
+select * from information_schema.triggers;
+select * from trg_member;
+insert into trg_member(name, mdate)
+	values('홍길동', curdate());
+    
+set sql_safe_updates = 0;    
+delete  from trg_member;    
+
+-- 트리거 삭제
+drop trigger trg_member_mid;    
+
+-- 
+show tables;
+drop table employee_2016;
+
+-- employee 테이블 구조만 복제
+desc employee;
+create table employee_stru
+as 
+select * from employee where 1 = 0;
+show tables;
+desc employee_stru;
+select * from employee_stru;
+
+-- employee_stru, emp_id에 기본키 제약사항 추가
+alter table employee_stru
+	add constraint primary key(emp_id);
+desc employee_stru;
+
+-- emp_id에 데이터 insert 작업 시 트리거가 실행되도록 생성
+-- 'E0001' 형식으로 데이터 추가
+select * from information_schema.triggers;
+
+/************************************************/
+delimiter $$
+create trigger trg_employee_stru_emp_id
+before insert on employee_stru -- 테이블명
+for each row
+begin
+declare max_code int;  
+
+-- 현재 저장된 값 중 가장 큰 값을 가져옴
+SELECT IFNULL(MAX(CAST(right(emp_id, 4) AS UNSIGNED)), 0)
+INTO max_code
+FROM employee_stru; 
+
+-- 'M0001' 형식으로 아이디 생성, LPAD(값, 크기, 채워지는 문자형식) : E0001
+SET NEW.emp_id = concat('E', LPAD((max_code+1), 4, '0'));
+
+end $$
+delimiter ;
+/************************************************/
+
+desc employee_stru;
+insert into employee_stru(emp_name, gender, hire_date, dept_id, phone, email, salary)
+	values('홍홍','F', curdate(), 'SYS','010-1234-1234', 'hong@test.com', 1000);
+    
+select * from employee_stru;  
+
+  
+
+-- 참조관계에 대한 트리거 생성 : 참조관계(부모(dept : dept_id) <---> 자식(emp : dept_id))
+select * from dept;
+select * from emp;
+
+-- ACC 부서 삭제
+delete from dept where dept_id ='ACC';   -- emp의 고소해 사원이 참조 중인 삭제 불가능!!
+
+-- GEN
+delete from dept where dept_id = 'GEN';  -- emp에서 참조하는 사원이 없으므로 삭제 가능!!
+
+-- 정주고 사원 삭제
+delete from emp where emp_id = 'S0019';
+
+-- 1. 참조 관계 설정 시 on delete cascade, on update cascade
+-- 부모의 참조 컬럼이 삭제되면, 자식의 행이 함께 삭제됨
+-- 뉴스테이블의 기사 컬럼이 삭제되며, 댓글테이블의 댓글이 함께 삭제
+-- 게시판의 게시글 삭제 시 게시글의 댓글이 함께 삭제
+create table board(
+	bid		int 	primary key		auto_increment,
+    title	varchar(100)	not null,
+    content		longtext,
+    bdate	datetime
+);
+
+create table reply(
+	rid		int 	primary key 	auto_increment,
+    content	 varchar(100)  not null,
+    bid		int		not null,
+    rdate	datetime,
+    constraint fk_reply_bid		foreign key(bid)
+			references  board(bid)  
+            on delete cascade 
+            on update cascade
+);
+desc board;
+desc reply;
+select * from board;
+insert into board(title, content, bdate)
+values('test', 'test', curdate()) ;
+
+select * from reply;
+insert into reply(content, bid, rdate)
+values('reply test', 2, curdate());
+
+-- bid, 2 삭제
+delete from board where bid = 2;
+select * from board;
+select * from reply;
 
 
+-- 2. 트리거를 사용하여 부모의 참조컬럼 삭제 시 자식의 참조 컬럼 데이터를 null로 변경
+-- **** 오라클 데이터베이스에서는 트리거 실행 가능!!!
+-- **** innoDB 형식의 데이터베이스인 mysql, maria는 트리거 실행 불가능!!
+-- 이유는 innoDB형식은 트리거 실행 전 참조관계를 먼저 체크하여 에러 발생 시킴!!
 
+select * from information_schema.triggers;
+-- dept 테이블의 row 삭제시(dept_id 컬럼 포함), 참조하는 emp 테이블의 dept_id에 null값 업데이트
+/************************************************/
+delimiter $$
+create trigger trg_dept_dept_id_delete
+after delete on dept -- 테이블명
+for each row
+begin
+-- 참조하는 emp 테이블의 dept_id에 null값 업데이트
+update emp
+	set dept_id = null
+    where dept_id = old.dept_id;  -- old.dept_id : dept 테이블에서 삭제된 dept_id
 
+end $$
+delimiter ;
+
+/************************************************/
+-- 사원 테이블의 급여 변경 시 로그 저장 :: 트리거 업데이트 이용
+select * from information_schema.triggers;
+create table salary_log(
+	emp_id	char(5)		primary key,
+    old_salary	int,
+    new_salary int,
+    change_date date
+);
+desc salary_log;
+select * from information_schema.triggers;
+select * from salary_log;
+update employee set salary = 7500
+where emp_id = 'S0020';
+/************************************************/
+delimiter $$
+create trigger trg_salary_update
+after update on employee -- 테이블명
+for each row
+begin
+-- 사원 테이블의 급여 변경 시 로그 저장, old.salary(기존급여), new.salary(새로운 급여)
+	if old.salary <> new.salary	then
+    insert into salary_log(emp_id, old_salary, new_salary, change_date)
+				values(old.emp_id, old.salary, new.salary, now());
+    end if;
+end $$
+delimiter ;
+/************************************************/

@@ -781,9 +781,21 @@ group by e.emp_id, e.emp_name;
 -- where t1.col = t2.col(+);
 
 -- 모든 부서의 부서아이디, 부서명, 본부명을 조회
+select e.emp_id, d.dept_name, u.unit_name
+from employee e, department d, unit u
+where e.dept_id = d.dept_id
+and d.unit_id = u.unit_id;
 
--- 본부별, 부서의  휴가사용 일수 조회
--- 부서의 누락없이 모두 출력
+-- 본부별, 부서의 휴가사용 일수 조회 단, 부서의 누락없이 모두 출력
+select u.unit_name, d.dept_name, count(v.duration)
+from employee e left outer join vacation v
+on e.emp_id = v.emp_id
+right outer join department d
+on e.dept_id = d.dept_id
+left outer join unit u
+on d.unit_id = u.unit_id
+group by u.unit_name, d.dept_name
+order by u.unit_name desc;
 
 -- 2017년부터 2018년도까지 입사한 사원들의 사원명, 입사일, 연봉, 부서명, 본부명 조회해주세요
 -- 단, 퇴사한 사원들 제외
