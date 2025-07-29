@@ -479,7 +479,7 @@ select  emp_id,
         format(ifnull(salary,0), 0) as salary,
         format(ifnull(salary,0) * 0.2, 0) as bonus
 from employee
-where left(hire_date, 4) between '2015' and '2017'
+where left(hire_date, 4) between '2016' and '2017'
 order by emp_id desc;
 
 -- [날짜함수]
@@ -642,7 +642,7 @@ select  dept_id,
 from employee
 where salary is not null
 group by dept_id
-having sum(salary) >= 30000;        
+having sum(salary) >= 30000;   
 	
 -- 연도별, 사원수, 총급여, 평균급여, 최대급여, 최소급여 조회
 -- 소수점 X, 3자리 구분
@@ -666,7 +666,7 @@ select  dept_id,
 		sum(ifnull(salary,0)) sum,
         avg(ifnull(salary,0)) avg
 from employee
-group by dept_id with rollup;      
+group by dept_id with rollup;
 
 -- rollup한 결과의 부서아이디를 추가
 select  if(grouping(dept_id), '총합계', ifnull(dept_id, '-')) as dept_id,
@@ -812,7 +812,7 @@ where e.dept_id = d.dept_id
 	and d.unit_id = u.unit_id
     and left(hire_date,4) between '2014' and '2016'
     and e.retire_date is null
-order by u.unit_id asc;    
+order by u.unit_id asc;   
 
 -- 부서별 총급여, 평균급여, 총휴가사용일수를 조회
 -- 부서명, 부서아이디, 총급여, 평균급여, 휴가사용일수 

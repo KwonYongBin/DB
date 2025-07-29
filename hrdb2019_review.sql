@@ -467,12 +467,27 @@ select '홍-길-동' as old, replace('홍-길-동', '-',',') as new from dual;
 -- 입사일, 퇴사일 출력은 '-'을 '/'로 치환하여 출력
 -- 재직중인 사원은 현재날짜를 출력
 -- 급여 출력시 3자리 콤마(,) 구분
+select 
+	emp_id, 
+    emp_name, 
+    replace(hire_date, '-', '/') as hire_date, 
+    replace(ifnull(retire_date,curdate()), '-', '/') as retire_date,
+    dept_id, 
+    phone, 
+    salary
+from employee;
+
 
 -- '20150101' 입력된 날짜를 기준으로 해당 날짜 이후에 입사한 사원들을 모두 조회
 -- 모든 mysql 데이터베이스에서 적용 가능한 형태로 작성
+select *
+from employee
+where hire_date >= cast('2015-01-01'as date);
 
 -- '20150101' ~ '20171231' 사이에 입사한 사원들을 모두 조회
-
+select *
+from employee
+where hire_date between cast('2015-01-01' as date) and cast('2017-12-31' as date);
 
 /************************************************************
 	그룹(집계) 함수 : sum(), avg(), min(), max(), count()..
@@ -506,6 +521,12 @@ select min(salary) from employee;
 
 -- 사원들의 총급여, 평균급여, 최대급여, 최소급여를 조회
 -- 3자리 구분
+select
+		format(sum(salary), 0) 총급여,
+		format(avg(salary), 0) 평균급여,
+        format(max(salary), 0) 최대급여,
+        format(min(salary), 0) 최소급여
+from employee;
 
 -- (5) count(컬럼) : 조건에 맞는 데이터의 row 수를 조회, null은 제외
 -- 전체 row count
@@ -520,15 +541,23 @@ select  count(*) as 총사원,
 from employee;
 
 -- '2015'년도에 입사한 입사자수
+select count(*) as 입사사원
+from employee
+where left(hire_date, 4) = '2015';
 
 -- 정보시스템(sys) 부서의 사원수
+select count(*)
+from employee
+where dept_id = 'sys';
 
 -- 가장 빠른 입사자, 가장 늦은 입사자를 조회 : max(), min() 함수를 사용
+select max(hire_date), min(hire_date)
+from employee;
 
 -- 가장 빨리 입사한 사람의 정보를 조회 : 서브쿼리로 그룹함수 사용!!
 select *
 from employee
-where hire_date = (select min(hire_date) from employee);
+where hire_date= (select min(hire_date) from employee);
 -- 위와 아래의 명령은 같은 결과를 나타내지만 위는 정보를 모를 때 아래는 정보를 인지하고 있을 때 사용한다.
 select *
 from employee
@@ -538,22 +567,51 @@ where hire_date = '2013-01-01';
 -- ~별 그룹핑이 가능한 컬럼으로 쿼리를 실행
 
 -- 부서별, 총급여, 평균급여, 사원수, 최대급여, 최소급여 조회
+select dept_id, count(*), format(sum(salary), 0), format(avg(salary), 0), format(max(salary), 0), format(min(salary), 0)
+from employee
+group by dept_id;
 
 -- 연도별, 사원수, 총급여, 평균급여, 최대급여, 최소급여 조회
 -- 소수점 X, 3자리 구분
+select left(hire_date, 4), count(*), format(sum(salary), 0), format(avg(salary), 0), format(max(salary), 0), format(min(salary), 0)
+from employee
+group by left(hire_date, 4);
 
 -- [having 조건절] : 그룹함수를 적용한 결과에 조건을 추가
 -- 부서별 총급여, 평균급여를 조회
 -- 부서의 총급여가 30000 이상인 부서만 출력
--- 급여 컬럼의 null은 제외     
+-- 급여 컬럼의 null은 제외
+select dept_id, sum(salary) as 총급여, avg(salary) as 평균급여
+from employee
+where salary is not null
+group by dept_id
+having sum(salary) >= 30000; 
 	
 -- 연도별, 사원수, 총급여, 평균급여, 최대급여, 최소급여 조회
 -- 소수점 X, 3자리 구분
 -- 총급여가 30000 이상인 년도 출력
 -- 급여 협상이 안된 사원은 제외
+select	left(hire_date, 4),
+		count(*) 사원수,
+		format(sum(salary), 0) 총급여,
+		format(avg(salary), 0) 평균급여,
+		format(max(salary), 0) 최대급여,
+		format(min(salary), 0) 최소급여
+from employee
+where salary is not null
+group by left(hire_date, 4)
+having sum(salary) >= 30000;
+
 
 -- rollup 함수 : 리포팅을 위한 함수
--- 부서별 사원수, 총급여, 평균급여 조회  
+-- 부서별 사원수, 총급여, 평균급여 조회
+select	dept_id,
+		count(*) 사원수,
+		format(sum(salary), 0) 총급여,
+		format(avg(salary), 0) 평균급여
+from employee
+where salary is not null
+group by dept_id with rollup;
 
 -- rollup한 결과의 부서아이디를 추가
 select  if(grouping(dept_id), '총합계', ifnull(dept_id, '-')) as dept_id,
@@ -561,7 +619,7 @@ select  if(grouping(dept_id), '총합계', ifnull(dept_id, '-')) as dept_id,
 		sum(ifnull(salary,0)) sum,
         avg(ifnull(salary,0)) avg
 from employee
-group by dept_id with rollup; 
+group by dept_id with rollup;
   
 --
 select 	left(hire_date, 4) 연도,
@@ -663,20 +721,51 @@ where e.dept_id = d.dept_id
     and e.emp_id = v.emp_id;
 
 -- 모든 사원들의 사번, 사원명, 부서아이디, 부서명, 입사일, 급여를 조회
+select e.emp_id, e.emp_name, e.dept_id, d.dept_name, e.hire_date, e.salary
+from employee e, department d
+where e.dept_id = d.dept_id;
 
 -- 영업부에 속한 사원들의 사번, 사원명, 입사일, 퇴사일, 폰번호, 급여, 부서아이디, 부서명 조회
-
+select e.emp_id, e.emp_name, e.hire_date, e.retire_date, e.phone, e.salary, e.dept_id, d.dept_name
+from employee e, department d
+where e.dept_id = d.dept_id
+	and d.dept_name = '영업';
+    
 -- 인사과에 속한 사원들 중에 휴가를 사용한 사원들의 내역을 조회
+select *
+from employee e, vacation v, department d
+where e.emp_id = v.emp_id
+	and e.dept_id = d.dept_id
+	and dept_name = '인사';
 
 -- 영업부서 사원의 사원명, 폰번호, 부서명, 휴가사용 이유 조회
 -- 휴가 사용 이유가 '두통'인 사원, 소속본부 조회 
+select e.emp_name, e.phone, d.dept_name, v.reason, u.unit_name
+from unit u, employee e, department d, vacation v
+where e.emp_id = v.emp_id
+	and e.dept_id = d.dept_id
+	and d.unit_id = u.unit_id
+    and d.dept_name = '영업'
+	and v.reason = '두통';
 
 -- 2014년부터 2016년까지 입사한 사원들 중에서 퇴사하지 않은 사원들의
 -- 사원아이디, 사원명, 부서명, 입사일, 소속본부를 조회 
 -- 소속본부 기준으로 오름차순 정렬
+select e.emp_id, e.emp_name, d.dept_name, e.hire_date, u.unit_name
+from employee e, department d, unit u
+where e.dept_id = d.dept_id
+and d.unit_id = u.unit_id
+and left(hire_date, 4) between '2014' and '2016'
+and e.retire_date is null
+order by u.unit_name asc;
 
 -- 부서별 총급여, 평균급여, 총휴가사용일수를 조회
--- 부서명, 부서아이디, 총급여, 평균급여, 휴가사용일수   
+-- 부서명, 부서아이디, 총급여, 평균급여, 휴가사용일수
+select e.emp_name, d.dept_id, sum(e.salary) as 총급여, avg(e.salary) as 평균급여, sum(v.duration)
+from employee e, department d, vacation v
+where e.dept_id = d.dept_id
+and e.emp_id = v.emp_id
+group by e.emp_id, e.emp_name;
 
 -- 본부별, 부서의  휴가사용 일수 
 
