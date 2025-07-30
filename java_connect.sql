@@ -21,3 +21,5 @@ select  dept_id,
 	unit_id, 
 	start_date
 from department;
+
+select * from employee;
