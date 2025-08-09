@@ -1,5 +1,6 @@
 use hrdb2019;
 select database();
+show tables;
 
 select
 	row_number() over() as rno,
